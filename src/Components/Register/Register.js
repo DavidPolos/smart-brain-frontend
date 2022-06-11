@@ -11,6 +11,9 @@ class Register extends React.Component {
 			name:''
 		}
 	}
+
+
+
 	onNameChange = (event) => {
 		this.setState({name: event.target.value})
 	}
@@ -21,26 +24,13 @@ class Register extends React.Component {
  		this.setState({password: event.target.value})
 	}
 
-	onSubmitSignIn = () => {
-		fetch('https://salty-caverns-97227.herokuapp.com/register',{
-			method: 'post',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				email: this.state.email,
-				password: this.state.password,
-				name: this.state.name
-			})
-		})
-		.then(response => response.json())
-		.then(user =>{
-			if (user.id){
-				this.props.loadUser(user);
-				this.props.onRouteChange('home');
-			}
-		})
-		
-	}
+
+
+
 	render() {
+		const enterRegister = (event) => enterSubmitRegister(event, email, password, name)
+		const { onSubmitRegister, enterSubmitRegister } = this.props;
+		const { email, password, name} = this.state;
 		return(
 		<article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-1 mw6 shadow-5 center">
 			<main className="pa4 black-80">
@@ -49,21 +39,20 @@ class Register extends React.Component {
 			      <legend className="f1 fw6 ph0 mh0">Register</legend>
 			      <div className="mt3">
 			        <label className="db fw6 lh-copy f6" htmlFor="name">Name</label>
-			        <input onChange={this.onNameChange} className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="text" name="name"  id="name" />
+			        <input onKeyPress={enterRegister} onChange={this.onNameChange} className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="text" name="name"  id="name" />
 			      </div>
 			      <div className="mt3">
 			        <label className="db fw6 lh-copy f6" htmlFor="email-address">Email</label>
-			        <input onChange={this.onEmailChange} className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="email" name="email-address"  id="email-address" />
+			        <input onKeyPress={enterRegister} onChange={this.onEmailChange} className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="email" name="email-address"  id="email-address" />
 			      </div>
 			      <div className="mv3">
 			        <label className="db fw6 lh-copy f6" htmlFor="password">Password</label>
-			        <input onChange={this.onPasswordChange}className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="password" name="password"  id="password" />
+			        <input onKeyPress={enterRegister} onChange={this.onPasswordChange}className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="password" name="password"  id="password" />
 			      </div>
-
 			    </fieldset>
 			    <div className="">
 			      <input 
-			      onClick={this.onSubmitSignIn}
+			      onClick={() => onSubmitRegister(email, password, name)}
 			      className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" 
 			      type="submit" 
 			      value="Register" />

@@ -32,6 +32,57 @@ class App extends Component{
     this.state = initialState;
   }
 
+
+  onSubmitRegister = (email, password, name) => {
+      fetch('https://salty-caverns-97227.herokuapp.com/register',{
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          name: name
+        })
+      })
+      .then(response => response.json())
+      .then(user =>{
+        if (user.id){
+          this.loadUser(user);
+          this.onRouteChange('home');
+        }
+      })
+    }
+
+  onSubmitSignIn = (email, password) => {
+    fetch('https://salty-caverns-97227.herokuapp.com/signin',{
+      method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    })
+    .then(response => response.json())
+    .then(user =>{
+      if (user.id){
+        this.loadUser(user);        
+        this.onRouteChange('home');
+
+      }
+    })
+    
+  }
+
+  enterSubmitRegister = (keyPress, email, password, name) => {
+    if (keyPress.key === "Enter"){
+      this.onSubmitRegister(email,password,name);
+    }
+  }
+  enterSubmitSignIn = (keyPress, email, password) => {
+    if (keyPress.key === "Enter"){
+      this.onSubmitSignIn(email, password); 
+    }
+  }
+
   loadUser = (data) => {
     this.setState({user: {
         id: data.id,
@@ -93,6 +144,12 @@ class App extends Component{
       .catch(err => console.log(err));
   }
 
+  ImageLinkFormEnterSubmit = (keyPress) =>{
+    if (keyPress.key === "Enter"){
+      this.onButtonSubmit();     
+    }
+  }
+
   onRouteChange = (route) => {
     if (route === 'signout'){
       this.setState(initialState)
@@ -104,22 +161,22 @@ class App extends Component{
   
 
   render() {
-    const { isSignedIn, imageUrl, route, box } = this.state;
+    const { isSignedIn, imageUrl, route, box,  } = this.state;
     return(
     <div className="App">
-      <ParticlesComp/>
+
       <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange}/>
       { route === 'home' 
          ? <div>
           <Logo />
           <Rank name={this.state.user.name} entries={this.state.user.entries} />
-          <ImageLinkForm onButtonSubmit={this.onButtonSubmit} onInputChange={this.onInputChange}/>
+          <ImageLinkForm ImageLinkFormEnterSubmit={this.ImageLinkFormEnterSubmit} onButtonSubmit={this.onButtonSubmit} onInputChange={this.onInputChange}/>
           <FaceRecognition box={box} imageUrl={imageUrl} />
          </div>
          :(
            this.state.route ==='signin'
-          ?<Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-           :<Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+          ?<Signin onSubmitSignIn={this.onSubmitSignIn} enterSubmitSignIn={this.enterSubmitSignIn} loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+           :<Register onSubmitRegister={this.onSubmitRegister} enterSubmitRegister={this.enterSubmitRegister} loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
 
             )
         }
