@@ -1,3 +1,13 @@
-.tilt{
-	background: linear-gradient(89deg, green 0%, #04C8DE 100%);
+.logobg{
+	background: #51B0BD;;
+	width: 150px;
+	height: 150px;
+	z-index: -1;
+	position: fixed;
+	opacity: 60%;
+
+}
+
+.logo{
+	opacity: 80%;
 }

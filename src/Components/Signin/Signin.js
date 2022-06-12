@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './Signin.css';
 
 class Signin extends React.Component{
 	constructor(props){
@@ -11,14 +11,15 @@ class Signin extends React.Component{
 	}
 
 	onEmailChange = (event) => {
-		this.setState({signInEmail: event.target.value})
+
+		this.setState({signInEmail: event.target.value.toLowerCase()})
 		if(this.props.failedSignIn){
 			this.props.resetFailedSignIn();
 		}
 
 	}
 	onPasswordChange = (event) => {
- 		this.setState({signInPassword: event.target.value})
+ 		this.setState({signInPassword: event.target.value.toLowerCase()})
 		if(this.props.failedSignIn){
 			this.props.resetFailedSignIn();
 		}
@@ -29,7 +30,7 @@ class Signin extends React.Component{
 	render(){
 		const rejectedSignIn = () => {
 			if (failedSignIn){
-				return (<p className="f6 link dim red db fw9 pointer">Wrong Email or Password</p>)
+				return (<p className="f6 red db fw9">Wrong Email or Password</p>)
 			}
 		}
 		const enterSignIn = (event) => enterSubmitSignIn(event, signInEmail, signInPassword)
@@ -37,11 +38,12 @@ class Signin extends React.Component{
 		const {onRouteChange, enterSubmitSignIn, onSubmitSignIn,failedSignIn} = this.props;		
 		return(
 
-			<article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-1 mw6 shadow-5 center">
+				
+			<article className="test br3 ba b--black-10 mv4 w-100 w-50-m w-25-1 mw6 shadow-5 center">
 				<main className="pa4 black-80">
 				  <div className="measure ">
 				    <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
-				      <legend className="f1 fw6 ph0 mh0">Sign In</legend>
+				      <legend className="f1 fw6 ph0 mh0 nowrap">Sign In</legend>
 				      <div className="mt3">
 				        <label className="db fw6 lh-copy f6" htmlFor="email-address">Email</label>
 				        <input onKeyPress={enterSignIn} onChange={this.onEmailChange} className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="email" name="email-address"  id="email-address" />

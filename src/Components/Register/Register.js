@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './Register.css';
 
 
 class Register extends React.Component {
@@ -15,20 +15,20 @@ class Register extends React.Component {
 
 
 	onNameChange = (event) => {
-		this.setState({name: event.target.value})
+		this.setState({name: event.target.value.toLowerCase()})
 		if(this.props.failedSignIn){
 			this.props.resetFailedSignIn();
 		}
 	}
 	onEmailChange = (event) => {
-		this.setState({email: event.target.value})
+		this.setState({email: event.target.value.toLowerCase()})
 		if(this.props.failedSignIn){
 			this.props.resetFailedSignIn();
 		}
 
 	}
 	onPasswordChange = (event) => {
- 		this.setState({password: event.target.value})
+ 		this.setState({password: event.target.value.toLowerCase()})
  		if(this.props.failedSignIn){
 			this.props.resetFailedSignIn();
 		}
@@ -41,7 +41,7 @@ class Register extends React.Component {
 	render() {
 		const rejectedSignIn = () => {
 			if (failedSignIn){
-				return (<p className="f6 link dim red db fw9 pointer">Name or Email already taken</p>)
+				return (<p className="f6 red db fw9">Name or Email already taken</p>)
 			}else{
 				return <div></div>
 			}
@@ -50,7 +50,7 @@ class Register extends React.Component {
 		const { onSubmitRegister, enterSubmitRegister,failedSignIn } = this.props;
 		const { email, password, name} = this.state;
 		return(
-		<article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-1 mw6 shadow-5 center">
+		<article className="test br3 ba b--black-10 mv4 w-100 w-50-m w-25-1 mw6 shadow-5 center">
 			<main className="pa4 black-80">
 			  <div className="measure ">
 			    <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
