@@ -16,6 +16,7 @@ const initialState = {
       box:{},
       route: 'signin',
       isSignedIn: false,
+      failedSignIn:false,
       user: {
         id: '',
         name: '',
@@ -32,6 +33,13 @@ class App extends Component{
     this.state = initialState;
   }
 
+   isEnter = (keyPress) => {
+   return keyPress.key === "Enter";
+  }
+
+  resetFailedSignIn = () => {
+    this.setState({failedSignIn: false});
+  }
 
   onSubmitRegister = (email, password, name) => {
       fetch('https://salty-caverns-97227.herokuapp.com/register',{
@@ -48,6 +56,8 @@ class App extends Component{
         if (user.id){
           this.loadUser(user);
           this.onRouteChange('home');
+        }else{
+          this.setState({failedSignIn: true})
         }
       })
     }
@@ -67,18 +77,20 @@ class App extends Component{
         this.loadUser(user);        
         this.onRouteChange('home');
 
+      }else{
+        this.setState({failedSignIn: true})
       }
     })
     
   }
 
   enterSubmitRegister = (keyPress, email, password, name) => {
-    if (keyPress.key === "Enter"){
+    if (this.isEnter(keyPress)){
       this.onSubmitRegister(email,password,name);
     }
   }
   enterSubmitSignIn = (keyPress, email, password) => {
-    if (keyPress.key === "Enter"){
+    if (this.isEnter(keyPress)){
       this.onSubmitSignIn(email, password); 
     }
   }
@@ -161,22 +173,48 @@ class App extends Component{
   
 
   render() {
-    const { isSignedIn, imageUrl, route, box,  } = this.state;
+    const { isSignedIn, imageUrl, route, box, failedSignIn } = this.state;
     return(
-    <div className="App">
 
-      <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange}/>
+    <div className="App">
+      <Navigation
+       resetFailedSignIn={this.resetFailedSignIn}
+       isSignedIn={isSignedIn} 
+       onRouteChange={this.onRouteChange}/>
       { route === 'home' 
-         ? <div>
+        ?<div>
           <Logo />
-          <Rank name={this.state.user.name} entries={this.state.user.entries} />
-          <ImageLinkForm ImageLinkFormEnterSubmit={this.ImageLinkFormEnterSubmit} onButtonSubmit={this.onButtonSubmit} onInputChange={this.onInputChange}/>
-          <FaceRecognition box={box} imageUrl={imageUrl} />
+          <Rank
+           name={this.state.user.name} 
+           entries={this.state.user.entries} />
+          <ImageLinkForm
+           ImageLinkFormEnterSubmit={this.ImageLinkFormEnterSubmit} 
+           onButtonSubmit={this.onButtonSubmit} 
+           onInputChange={this.onInputChange}
+           />
+          <FaceRecognition
+           box={box} 
+           imageUrl={imageUrl} 
+           />
          </div>
          :(
            this.state.route ==='signin'
-          ?<Signin onSubmitSignIn={this.onSubmitSignIn} enterSubmitSignIn={this.enterSubmitSignIn} loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-           :<Register onSubmitRegister={this.onSubmitRegister} enterSubmitRegister={this.enterSubmitRegister} loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+          ?<Signin
+           resetFailedSignIn={this.resetFailedSignIn}
+           failedSignIn={failedSignIn}
+           onSubmitSignIn={this.onSubmitSignIn} 
+           enterSubmitSignIn={this.enterSubmitSignIn} 
+           loadUser={this.loadUser} 
+           onRouteChange={this.onRouteChange}
+           />
+           :<Register
+            resetFailedSignIn={this.resetFailedSignIn}
+            failedSignIn={failedSignIn}
+            onSubmitRegister={this.onSubmitRegister} 
+            enterSubmitRegister={this.enterSubmitRegister} 
+            loadUser={this.loadUser} 
+            onRouteChange={this.onRouteChange}
+            />
 
             )
         }

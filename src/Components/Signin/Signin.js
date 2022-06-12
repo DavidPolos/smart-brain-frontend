@@ -1,7 +1,6 @@
 import React from 'react';
 
 
-
 class Signin extends React.Component{
 	constructor(props){
 		super(props);
@@ -13,19 +12,31 @@ class Signin extends React.Component{
 
 	onEmailChange = (event) => {
 		this.setState({signInEmail: event.target.value})
+		if(this.props.failedSignIn){
+			this.props.resetFailedSignIn();
+		}
+
 	}
 	onPasswordChange = (event) => {
  		this.setState({signInPassword: event.target.value})
+		if(this.props.failedSignIn){
+			this.props.resetFailedSignIn();
+		}
 	}
 
-	
+
 
 	render(){
-
+		const rejectedSignIn = () => {
+			if (failedSignIn){
+				return (<p className="f6 link dim red db fw9 pointer">Wrong Email or Password</p>)
+			}
+		}
 		const enterSignIn = (event) => enterSubmitSignIn(event, signInEmail, signInPassword)
 		const { signInEmail, signInPassword } = this.state;
-		const {onRouteChange, enterSubmitSignIn, onSubmitSignIn} = this.props;		
+		const {onRouteChange, enterSubmitSignIn, onSubmitSignIn,failedSignIn} = this.props;		
 		return(
+
 			<article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-1 mw6 shadow-5 center">
 				<main className="pa4 black-80">
 				  <div className="measure ">
@@ -49,6 +60,7 @@ class Signin extends React.Component{
 				    </div>
 				    <div className="lh-copy mt3">
 				      <p onClick={() => onRouteChange('register')} className="f6 link dim black db pointer">Register</p>
+				      {rejectedSignIn()}
 				    </div>
 				  </div>
 				</main>
@@ -58,3 +70,5 @@ class Signin extends React.Component{
 }
 
 export default Signin
+
+/*<p className="f6 link dim red db fw9 pointer">that username is already taken</p>*/

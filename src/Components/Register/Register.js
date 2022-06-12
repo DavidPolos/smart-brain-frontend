@@ -16,20 +16,38 @@ class Register extends React.Component {
 
 	onNameChange = (event) => {
 		this.setState({name: event.target.value})
+		if(this.props.failedSignIn){
+			this.props.resetFailedSignIn();
+		}
 	}
 	onEmailChange = (event) => {
 		this.setState({email: event.target.value})
+		if(this.props.failedSignIn){
+			this.props.resetFailedSignIn();
+		}
+
 	}
 	onPasswordChange = (event) => {
  		this.setState({password: event.target.value})
+ 		if(this.props.failedSignIn){
+			this.props.resetFailedSignIn();
+		}
+
 	}
 
 
 
 
 	render() {
+		const rejectedSignIn = () => {
+			if (failedSignIn){
+				return (<p className="f6 link dim red db fw9 pointer">Name or Email already taken</p>)
+			}else{
+				return <div></div>
+			}
+		}
 		const enterRegister = (event) => enterSubmitRegister(event, email, password, name)
-		const { onSubmitRegister, enterSubmitRegister } = this.props;
+		const { onSubmitRegister, enterSubmitRegister,failedSignIn } = this.props;
 		const { email, password, name} = this.state;
 		return(
 		<article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-1 mw6 shadow-5 center">
@@ -57,6 +75,7 @@ class Register extends React.Component {
 			      type="submit" 
 			      value="Register" />
 			    </div>
+			    {rejectedSignIn()}
 			  </div>
 			</main>
 		</article>
