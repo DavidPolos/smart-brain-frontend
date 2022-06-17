@@ -1,13 +1,5 @@
-.logobg{
-	background: #51B0BD;
-	width: 150px;
-	height: 150px;
-	z-index: -1;
-	position: fixed;
-	opacity: 60%;
-
-}
 
 .logo{
+	background:rgba(81, 176, 189, .6);
 	opacity: 80%;
 }
