@@ -1,5 +1,6 @@
 
 .logo{
+	position: relative;
 	background:rgba(81, 176, 189, .6);
 	opacity: 80%;
 }
