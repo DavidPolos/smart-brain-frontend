@@ -1,7 +1,6 @@
 import React from 'react';
 
 const Navigation = ({ onRouteChange, isSignedIn, resetFailedSignIn }) => {
-
 		if (isSignedIn){
 		return(
 			<nav style={{display:'flex',justifyContent: 'flex-end'}}>
@@ -16,7 +15,6 @@ const Navigation = ({ onRouteChange, isSignedIn, resetFailedSignIn }) => {
 			</nav>
 		);
 		}
-
 }
 
 export default Navigation
