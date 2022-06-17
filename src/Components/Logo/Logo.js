@@ -8,7 +8,6 @@ const Logo = () => {
 
 		<div className="ma4 mt0">
 		    <Tilt style={{height:'150px',width:'150px'}} className='tilt br2 shadow-2'>
-		      <div className='logobg' ></div>
 		      	<img className="logo" alt='logo' src={brain} />		      
 		    </Tilt>
 		</div>
