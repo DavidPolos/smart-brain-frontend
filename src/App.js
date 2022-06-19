@@ -25,23 +25,42 @@ const initialState = {
       }
     }
 
+const devServer = "http://localhost:3001";
+const deployServer = "https://salty-caverns-97227.herokuapp.com";
+const currentServer = devServer;
 
 class App extends Component{
   constructor(){
     super();
     this.state = initialState;
   }
-
-   isEnter = (keyPress) => {
-   return keyPress.key === "Enter";
+  //Checks if the user has a session where they were logged in 
+  //and logs them in if they did
+  isThereSession = () =>{
+    this.loadingUserIn(
+      fetch(`${currentServer}/`,{
+      withCredentials: true,
+      credentials: 'include',
+          method: 'GET',
+          headers: {'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      }
+      )
+    )
   }
-
+  // is enter?
+  isEnter = (keyPress) => {
+    return keyPress.key === "Enter";
+  }
+  //removes failed to signin text
   resetFailedSignIn = () => {
     this.setState({failedSignIn: false});
   }
-//fetch('https://salty-caverns-97227.herokuapp.com/register',
+  //registers user
   onSubmitRegister = (email, password, name) => {
-      fetch('https://salty-caverns-97227.herokuapp.com/register',{
+    this.logginUserIn(
+      fetch(`${currentServer}/register`,{
         credentials: 'include',
         method: 'post',
         headers: {'Content-Type': 'application/json'},
@@ -51,24 +70,39 @@ class App extends Component{
           name: name
         })
       })
-      .then(response => response.json())
+      )
+  }
+  //Loads user returns true if success false if not a success
+  loadingUserIn = (promise) => {
+    if(promise.then(response => response.json())
       .then(user =>{
         if (user.id){
-          this.loadUser(user);
+          this.loadUser(user);        
           this.onRouteChange('home');
+          return true;
         }else{
-          this.setState({failedSignIn: true})
+          return false;
         }
       })
+      ){
+      return true;
+  }else{
+    return false;
+  }
+}
+  //Attempts to log in user if cant then notifies user that something went wrong
+  loggingUserIn = (promise) =>{
+    if(this.loadingUserIn(promise)){
+      return;
+    }else{
+      this.setState({failedSignIn: true})      
     }
+  }
 
-
-
-
-
-//on deployment dont forget fetch('https://salty-caverns-97227.herokuapp.com/signin',
+  //signs user in
   onSubmitSignIn = (email, password) => {
-    fetch('https://salty-caverns-97227.herokuapp.com/signin',{
+    this.loggingUserIn(
+      fetch(`${currentServer}/signin`,{
       credentials: 'include',
       method: 'post',
       headers: {'Content-Type': 'application/json'},
@@ -77,40 +111,32 @@ class App extends Component{
         password: password
       })
     })
-    .then(response => response.json())
-    .then(user =>{
-      if (user.id){
-        this.loadUser(user);        
-        this.onRouteChange('home');
-
-      }else{
-        this.setState({failedSignIn: true})
-      }
-    })
-    
+    )
   }
-
+  //registers user on enter click
   enterSubmitRegister = (keyPress, email, password, name) => {
     if (this.isEnter(keyPress)){
       this.onSubmitRegister(email,password,name);
     }
   }
+  //signs user in on enter click
   enterSubmitSignIn = (keyPress, email, password) => {
     if (this.isEnter(keyPress)){
       this.onSubmitSignIn(email, password); 
     }
   }
-
+  // loads the user in after login or register
   loadUser = (data) => {
     this.setState({user: {
         id: data.id,
         name: data.name,
         email: data.email,
         entries: data.entries,
-        joined: data.joined,
+        joined: data.joined
     }})
   }
 
+  //searches for face in image
   calculateFaceLocation = (data) =>{
     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById('inputimage');
@@ -131,10 +157,10 @@ class App extends Component{
   onInputChange = (event) =>{
     this.setState({input:event.target.value});
   }
-
+  //submits picture to api
   onButtonSubmit = () => {
       this.setState({imageUrl: this.state.input})
-       fetch('https://salty-caverns-97227.herokuapp.com/imageurl',{
+       fetch(`${currentServer}/imageurl`,{
         method: 'post',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -144,7 +170,7 @@ class App extends Component{
       .then(response => response.json())
       .then(response =>{
         if (response){
-          fetch('https://salty-caverns-97227.herokuapp.com/image',{
+          fetch(`${currentServer}/image`,{
               method: 'put',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify({
@@ -161,24 +187,23 @@ class App extends Component{
       })
       .catch(err => console.log(err));
   }
-
+  //submits on enter press
   ImageLinkFormEnterSubmit = (keyPress) =>{
     if (keyPress.key === "Enter"){
       this.onButtonSubmit();     
     }
   }
-
-  //Deletes session on signout
+  //takes care of different routes
   onRouteChange = (route) => {
     if (route === 'signout'){
-      this.setState(initialState)
-      fetch('https://salty-caverns-97227.herokuapp.com/signout',{
+      fetch(`${currentServer}/signout`,{
         credentials: 'include',
         method: 'DELETE',
         headers: {'Content-Type': 'application/json'
       }
     })
-      route = 'signin'
+      .then(route = 'signin')
+      .then(this.setState(initialState))
     } else if(route === 'home'){
       this.setState({isSignedIn: true})
     }
@@ -212,7 +237,7 @@ class App extends Component{
          :(
            this.state.route ==='signin'
           ?
-          <Session isSignedIn={isSignedIn} loadUser={this.loadUser} onRouteChange={this.onRouteChange} >
+          <Session isSignedIn={isSignedIn} isThereSession={this.isThereSession} >
             <Signin
              resetFailedSignIn={this.resetFailedSignIn}
              failedSignIn={failedSignIn}
