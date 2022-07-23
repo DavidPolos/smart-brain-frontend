@@ -1,0 +1,18 @@
+.h1RegisterPfp{
+	position: absolute;
+	top: 20px;
+	width: 100%;
+	z-index: -1;
+}
+.refreshButton{
+		margin-bottom: 40px;
+		border-radius: 20px;
+		background:
+	    radial-gradient(rgba(0, 0, 0, .5) 3px, transparent 4px),
+	    radial-gradient(rgba(0, 0, 0, .5) 3px, transparent 4px),
+	    linear-gradient(rgba(81, 175, 188, .5) 4px, transparent 0),
+	    
+	    rgba(81, 175, 188, 0.5);
+	    background-size: 109px 109px, 109px 109px,100% 6px, 109px 109px, 109px 109px;
+	    background-position: 54px 55px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+}

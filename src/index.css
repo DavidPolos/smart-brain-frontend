@@ -1,7 +1,10 @@
 /*#ECEDDC #a83e36*/
+html {
+  height: 100vh;
+}
 
 body {
-
+  height: 100vh;
   margin: 0;
   font-family: FreeMono, monospace;
   -webkit-font-smoothing: antialiased;
@@ -20,3 +23,6 @@ button{
   cursor: pointer;
 }
 
+#root{
+  height: 100%;
+}

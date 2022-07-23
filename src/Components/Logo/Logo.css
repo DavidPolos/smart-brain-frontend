@@ -1,6 +1,16 @@
+.logoDiv{
+	display: flex;
+	flex-wrap: wrap;
 
+
+}
 .logo{
+	border-radius: 20px;
+	margin: 50px;
+	margin-bottom: 0px;
 	position: relative;
 	background:rgba(81, 176, 189, .6);
 	opacity: 80%;
 }
+
+

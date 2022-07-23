@@ -1,4 +1,4 @@
-import React,{ Component } from 'react';
+import React,{ Component, useContext, createContext } from 'react';
 import './App.css';
 import Navigation from './Components/Navigation/Navigation';
 import Logo from './Components/Logo/Logo';
@@ -8,6 +8,13 @@ import FaceRecognition from './Components/FaceRecognition/FaceRecognition';
 import Signin from './Components/Signin/Signin';
 import Register from './Components/Register/Register';
 import Session from './Components/Session/Session';
+import UserProfilePicture from './Components/UserProfilePicture/UserProfilePicture';
+import RegisterProfilePicture from './Components/RegisterProfilePicture/RegisterProfilePicture';
+import Friends from './Components/Friends/Friends';
+ 
+
+export const UserContext = createContext();
+
 
 const initialState = {
       input: '',
@@ -22,6 +29,20 @@ const initialState = {
         email: '',
         entries: 0,
         joined: '',
+        profilePicture: null,
+        friends: [
+        {
+          name:'pichael',
+          email:'pichael@robot.com',
+          entries:9,
+          messages:[]
+        },        {
+          name:'bobby',
+          email:'bobby@robot.com',
+          entries:15,
+          messages:[]
+        }
+        ]
       }
     }
 
@@ -33,6 +54,51 @@ class App extends Component{
   constructor(){
     super();
     this.state = initialState;
+  }
+
+    //Loads user returns true if success false if not a success
+  loadingUserIn = (promise) => {
+    if(promise.then(response => response.json())
+      .then(user =>{
+        if (user.id){
+          this.loadUser(user);        
+          this.onRouteChange('home');
+          return true;
+        }else{
+          return false;
+        }
+      })
+      ){
+      return false;
+  }else{
+    return false;
+  }
+}
+
+  //Attempts to log in user if cant then notifies user that something went wrong
+  loggingUserIn = (promise) =>{
+    if(this.loadingUserIn(promise)){
+      return;
+    }else{
+      this.setState({failedSignIn: true})
+    }
+  }
+
+  setProfilePicture = (profileId) =>{
+    fetch(`${currentServer}/pfp`,{
+        credentials: 'include',
+        method: 'put',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          pfp: profileId,
+          id: this.state.user.id
+        })
+    })
+    .then(
+    this.setState({user:{...this.state.user,profilePicture:profileId}})
+    )
+    .then(this.onRouteChange('home'))
+    .catch(err => console.log(err))
   }
   //Checks if the user has a session where they were logged in 
   //and logs them in if they did
@@ -49,6 +115,14 @@ class App extends Component{
       )
     )
   }
+
+  setUserProfile = () => {
+    if (this.state.user.profilePicture === null ){
+      return this.setState({route: 'selectprofile'})
+    }else{
+      return this.setState({route: 'home'})
+    }
+  }
   // is enter?
   isEnter = (keyPress) => {
     return keyPress.key === "Enter";
@@ -59,7 +133,7 @@ class App extends Component{
   }
   //registers user
   onSubmitRegister = (email, password, name) => {
-    this.logginUserIn(
+    this.loggingUserIn(
       fetch(`${currentServer}/register`,{
         credentials: 'include',
         method: 'post',
@@ -72,32 +146,7 @@ class App extends Component{
       })
       )
   }
-  //Loads user returns true if success false if not a success
-  loadingUserIn = (promise) => {
-    if(promise.then(response => response.json())
-      .then(user =>{
-        if (user.id){
-          this.loadUser(user);        
-          this.onRouteChange('home');
-          return true;
-        }else{
-          return false;
-        }
-      })
-      ){
-      return true;
-  }else{
-    return false;
-  }
-}
-  //Attempts to log in user if cant then notifies user that something went wrong
-  loggingUserIn = (promise) =>{
-    if(this.loadingUserIn(promise)){
-      return;
-    }else{
-      this.setState({failedSignIn: true})      
-    }
-  }
+
 
   //signs user in
   onSubmitSignIn = (email, password) => {
@@ -127,12 +176,15 @@ class App extends Component{
   }
   // loads the user in after login or register
   loadUser = (data) => {
+
     this.setState({user: {
+      ...this.state.user,
         id: data.id,
         name: data.name,
         email: data.email,
         entries: data.entries,
-        joined: data.joined
+        joined: data.joined,
+        profilePicture: data.pfp
     }})
   }
 
@@ -206,24 +258,28 @@ class App extends Component{
       .then(this.setState(initialState))
     } else if(route === 'home'){
       this.setState({isSignedIn: true})
+      return setTimeout(this.setUserProfile,1)
     }
     this.setState({route: route});
   }
   
   render() {
     const { isSignedIn, imageUrl, route, box, failedSignIn } = this.state;
+    const { profilePicture, name, entries } = this.state.user;
     return(
     <div className="App">
       <Navigation
+       route={route}
        resetFailedSignIn={this.resetFailedSignIn}
        isSignedIn={isSignedIn} 
        onRouteChange={this.onRouteChange}/>
       { route === 'home' 
         ?<div>
+          <UserProfilePicture profilePicture={profilePicture}/>
           <Logo />
           <Rank
-           name={this.state.user.name} 
-           entries={this.state.user.entries} />
+           name={name} 
+           entries={entries} />
           <ImageLinkForm
            ImageLinkFormEnterSubmit={this.ImageLinkFormEnterSubmit} 
            onButtonSubmit={this.onButtonSubmit} 
@@ -247,7 +303,10 @@ class App extends Component{
              onRouteChange={this.onRouteChange}
              />
            </Session>
-           :<Register
+           :(
+             this.state.route ==='register'
+             ?
+            <Register
             resetFailedSignIn={this.resetFailedSignIn}
             failedSignIn={failedSignIn}
             onSubmitRegister={this.onSubmitRegister} 
@@ -255,7 +314,17 @@ class App extends Component{
             loadUser={this.loadUser} 
             onRouteChange={this.onRouteChange}
             />
+            :(
+              this.state.route === 'selectprofile'
+              ?
+              <RegisterProfilePicture setProfilePicture={this.setProfilePicture}/>
+              :
+              <UserContext.Provider value={this.state.user}>
+                <Friends currentServer={currentServer} isEnter={this.isEnter} friends={this.state.user.friends}/>
+              </UserContext.Provider>
+              )
             )
+           )
         }
     </div>
     );
